@@ -1,0 +1,39 @@
+{
+    "name": "kitchenplus",
+    "version": "5.3.7.1",
+    "styleFileList": [],
+    "scriptFileList_inject_early": [],
+    "scriptFileList": [],
+    "tweeFileList": [],
+    "imgFileList": [],
+    "additionFile": [],
+    "addonPlugin": [
+        {
+            "modName": "TweeReplacer",
+            "addonName": "TweeReplacerAddon",
+            "modVersion": "1.0.0",
+            "params": [
+                {
+                    "passage": "Widgets Kitchen",
+                    "findString": "<<if $plants[_food].recipe is true and _recipe_go is true>>",
+                    "replace": "<<if $plants[_food].recipe is true and _recipe_go is true>>\n\t\t\t\t<<unset _ingredients_available>><<unset _ingredients_blocked>>\n\t\t\t\t<<for _e to 0; _e lt setup.plants[_food].ingredients.length; _e++>>\n\t\t\t\t\t<<set _ingredient to setup.plants[_food].ingredients[_e]>>\n\t\t\t\t\t<<if Object.keys($plants).includes(_ingredient)>>\n                        <<if $plants[_ingredient].amount gte 1 or _ingredients_supplied.includes(_ingredient)>>\n                            <<if $bus is \"orphanage_kitchen\" and !_ingredients_exceptions.includes(_ingredient) and !_ingredients_supplied.includes(_ingredient)>>\n                                <<set _ingredients_blocked to true>>\n                            <</if>>\n                        <<else>>\n                            <<set _ingredients_available to false>>\n                        <</if>>\n\t\t\t\t\t<<else>>\n\t\t\t\t\t<</if>>\n\t\t\t\t<</for>>\n\t\t\t\t<<if $showrecipesonlycanmake and _ingredients_available is false>><<continue>><</if>>"
+                },
+                {
+                    "passage": "Widgets Kitchen",
+                    "findString": "<<widget \"kitchen_display_all\">>",
+                    "replace": "<<widget \"kitchen_display_all\">>\n\t<<if $showrecipesonlycanmake is undefined or !$showrecipesonlycanmake>>\n\t\t<<link [[改为只显示可做食谱|$passage]]>><<set $showrecipesonlycanmake to true>><</link>>\n\t<<else>>\n\t\t<<link [[改为显示全部食谱|$passage]]>><<unset $showrecipesonlycanmake>><</link>>\n\t<</if>>"
+                }
+            ]
+        }
+    ],
+    "dependenceInfo": [
+        {
+            "modName": "TweeReplacer",
+            "version": "^1.0.0"
+        },
+        {
+            "modName": "ReplacePatcher",
+            "version": ">=1.0.0"
+        }
+    ]
+}
