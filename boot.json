@@ -1,6 +1,6 @@
 {
     "name": "kitchenplus",
-    "version": "5.3.7.1",
+    "version": "5.3.7.2",
     "styleFileList": [],
     "scriptFileList_inject_early": [],
     "scriptFileList": [],
@@ -16,12 +16,17 @@
                 {
                     "passage": "Widgets Kitchen",
                     "findString": "<<if $plants[_food].recipe is true and _recipe_go is true>>",
-                    "replace": "<<if $plants[_food].recipe is true and _recipe_go is true>>\n\t\t\t\t<<unset _ingredients_available>><<unset _ingredients_blocked>>\n\t\t\t\t<<for _e to 0; _e lt setup.plants[_food].ingredients.length; _e++>>\n\t\t\t\t\t<<set _ingredient to setup.plants[_food].ingredients[_e]>>\n\t\t\t\t\t<<if Object.keys($plants).includes(_ingredient)>>\n                        <<if $plants[_ingredient].amount gte 1 or _ingredients_supplied.includes(_ingredient)>>\n                            <<if $bus is \"orphanage_kitchen\" and !_ingredients_exceptions.includes(_ingredient) and !_ingredients_supplied.includes(_ingredient)>>\n                                <<set _ingredients_blocked to true>>\n                            <</if>>\n                        <<else>>\n                            <<set _ingredients_available to false>>\n                        <</if>>\n\t\t\t\t\t<<else>>\n\t\t\t\t\t<</if>>\n\t\t\t\t<</for>>\n\t\t\t\t<<if $showrecipesonlycanmake and _ingredients_available is false>><<continue>><</if>>"
+                    "replace": "<<if $plants[_food].recipe is true and _recipe_go is true>>\n\t\t\t\t<<if $recipefilter is not undefined>>\n\t\t\t\t\t<<if !setup.plants[_food].name.includes($recipefilter) and !setup.plants[_food].plural.includes($recipefilter)>><<continue>><</if>>\n\t\t\t\t\t<<set $recipefilternum += 1>>\n\t\t\t\t<</if>>\n\t\t\t\t<<if $showrecipesonlycanmake>>\n\t\t\t\t\t<<unset _ingredients_available>><<unset _ingredients_blocked>>\n\t\t\t\t\t<<for _e to 0; _e lt setup.plants[_food].ingredients.length; _e++>>\n\t\t\t\t\t\t<<set _ingredient to setup.plants[_food].ingredients[_e]>>\n\t\t\t\t\t\t<<if Object.keys($plants).includes(_ingredient)>>\n\t\t\t\t\t\t\t<<if $plants[_ingredient].amount gte 1 or _ingredients_supplied.includes(_ingredient)>>\n\t\t\t\t\t\t\t<<else>>\n\t\t\t\t\t\t\t\t<<set _ingredients_available to false>>\n\t\t\t\t\t\t\t<</if>>\n\t\t\t\t\t\t<<else>>\n\t\t\t\t\t\t<</if>>\n\t\t\t\t\t<</for>>\n\t\t\t\t\t<<if _ingredients_available is false>><<continue>><</if>>\n\t\t\t\t\t<<if $recipefiltercanmakenum is not undefined>><<set $recipefiltercanmakenum += 1>><</if>>\n\t\t\t\t<</if>>"
                 },
                 {
                     "passage": "Widgets Kitchen",
                     "findString": "<<widget \"kitchen_display_all\">>",
-                    "replace": "<<widget \"kitchen_display_all\">>\n\t<<if $showrecipesonlycanmake is undefined or !$showrecipesonlycanmake>>\n\t\t<<link [[改为只显示可做食谱|$passage]]>><<set $showrecipesonlycanmake to true>><</link>>\n\t<<else>>\n\t\t<<link [[改为显示全部食谱|$passage]]>><<unset $showrecipesonlycanmake>><</link>>\n\t<</if>>"
+                    "replace": "<<widget \"kitchen_display_all\">>\n\t<input id=\"recipefilter\" type=\"text\" value=\"\" maxlength=\"30\" onfocus=\"V.tempDisable = true;\">\n\t<div class=\"wardrobe-action\">\n\t\t<label class=\"no-numberify\"><<link [[筛选|$passage]]>>\n\t\t\t<<set $recipefilter to document.getElementById(\"recipefilter\").value.replace(\"/[^a-zA-Z\\u4e00-\\u9fa5 0-9.!() ]+/g\",\"\").replace(\"/ /g\",\"_\")>><<if !$recipefilter>><<unset $recipefilter>><</if>><<set $recipefilternum to 0>>\n\t\t<</link>></label>\n\t</div>\n\t<br>\n\t<<set $recipefiltercanmakenum to 0>>\n\t<<if $showrecipesonlycanmake is undefined or !$showrecipesonlycanmake>>\n\t\t<label class=\"no-numberify\"><<link [[改为只显示可做食谱|$passage]]>><<set $showrecipesonlycanmake to true>><</link>></label>\n\t<<else>>\n\t\t<label class=\"no-numberify\"><<link [[改为显示全部食谱|$passage]]>><<unset $showrecipesonlycanmake>><</link>></label>\n\t<</if>>"
+                },
+                {
+                    "passage": "Widgets Kitchen",
+                    "findString": "<<kitchen_display \"drinks\">>\n    <br>",
+                    "replace": "<<kitchen_display \"drinks\">>\n    <br>\n\t<<if $recipefilter is not undefined>>\n\t\t已筛选出 $recipefilternum 条食谱<<if $showrecipesonlycanmake>>，其中 $recipefiltercanmakenum 条可做<</if>>\n\t\t<<unset $recipefilter>><<unset $recipefilternum>>\n\t<</if>>\n\t<br>"
                 }
             ]
         }
@@ -30,10 +35,6 @@
         {
             "modName": "TweeReplacer",
             "version": "^1.0.0"
-        },
-        {
-            "modName": "ReplacePatcher",
-            "version": ">=1.0.0"
         }
     ]
 }
